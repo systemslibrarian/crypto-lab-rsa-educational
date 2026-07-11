@@ -3,7 +3,8 @@
    --accent is the demo's brand color; the shared header tints from it. */
 
 :root {
-  --accent: #f59e0b; /* amber */
+  --accent: #f59e0b; /* amber — brand fill (button/border/header tint) */
+  --link: #f59e0b; /* accent used as TEXT; overridden darker in light theme for AA contrast */
   --bg: #0e1116;
   --bg-elev: #161b22;
   --bg-inset: #0a0d12;
@@ -28,14 +29,19 @@
   --border-color: #d0d7de;
   --text: #1f2328;
   --text-muted: #59636e;
-  --good: #1a7f37;
-  --good-bg: rgba(26, 127, 55, 0.1);
-  --bad: #cf222e;
-  --bad-bg: rgba(207, 34, 46, 0.08);
-  --warn: #9a6700;
-  --warn-bg: rgba(154, 103, 0, 0.1);
-  --alarm: #d1242f;
-  --alarm-bg: rgba(209, 36, 47, 0.1);
+  /* Amber reads at only ~2.1:1 as text on a light page; use a darker "burnt"
+     amber for accent TEXT while keeping the brighter --accent for fills. */
+  --link: #8f5100;
+  /* Semantic text colors nudged darker so colored text on its own low-alpha
+     tint clears WCAG AA (4.5:1) over the light background. */
+  --good: #116b2c;
+  --good-bg: rgba(17, 107, 44, 0.1);
+  --bad: #bd1b26;
+  --bad-bg: rgba(189, 27, 38, 0.09);
+  --warn: #8a5c00;
+  --warn-bg: rgba(138, 92, 0, 0.1);
+  --alarm: #bd1b26;
+  --alarm-bg: rgba(189, 27, 38, 0.1);
 }
 
 * { box-sizing: border-box; }
@@ -74,7 +80,7 @@ body {
 .panel h2 { margin: 0 0 0.5rem; font-size: 1.35rem; }
 .lede { color: var(--text-muted); margin: 0 0 1rem; }
 .fine { color: var(--text-muted); font-size: 0.85rem; }
-a { color: var(--accent); }
+a { color: var(--link); }
 
 /* Overview */
 .trapdoor { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
@@ -135,7 +141,7 @@ input.text { min-width: 12rem; width: 100%; }
 .step__value { font-family: var(--mono); word-break: break-all; }
 .step__note { grid-column: 2; color: var(--text-muted); font-size: 0.8rem; }
 .trace { margin-top: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0.8rem; }
-.trace summary { cursor: pointer; color: var(--accent); }
+.trace summary { cursor: pointer; color: var(--link); }
 .mono { font-family: var(--mono); }
 .dim { color: var(--text-muted); }
 .modexp__head { font-size: 0.9rem; color: var(--text-muted); }
@@ -160,7 +166,7 @@ input.text { min-width: 12rem; width: 100%; }
   white-space: nowrap;
 }
 .codebox__copy { background: var(--bg-inset); border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; padding: 0 0.7rem; cursor: pointer; }
-.codebox__copy:hover { color: var(--accent); border-color: var(--accent); }
+.codebox__copy:hover { color: var(--link); border-color: var(--accent); }
 
 /* Verdicts — paired icon + text + color (never color alone) */
 .verdict { border-radius: 8px; padding: 0.6rem 0.8rem; font-weight: 600; }
