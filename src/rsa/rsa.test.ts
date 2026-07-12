@@ -93,6 +93,44 @@ describe('sign/verify', () => {
     expect(verify('transfer $100', signature, k.pub).ok).toBe(true);
     expect(verify('transfer $900', signature, k.pub).ok).toBe(false);
   });
+
+  it('rejects an arbitrary forged signature over an unsigned message', () => {
+    // Verification must fail for a signature the private key never produced.
+    for (const forged of [1n, 2n, 42n, k.pub.n - 1n]) {
+      expect(verify('pay attacker', forged, k.pub).ok).toBe(false);
+    }
+  });
+});
+
+// The README "What Can Go Wrong" section makes two concrete claims about the
+// insecurity of textbook RSA. These tests demonstrate the claims are TRUE, so
+// the exhibit's narrative is backed by executable evidence rather than assertion.
+describe('textbook RSA is malleable — the homomorphic property (README claim)', () => {
+  it('Enc(m1)·Enc(m2) mod n = Enc(m1·m2 mod n)', () => {
+    const n = kBig.pub.n;
+    const m1 = 123n % n;
+    const m2 = 45n % n;
+    const c1 = encrypt(asPlaintext(m1, n), kBig.pub).value;
+    const c2 = encrypt(asPlaintext(m2, n), kBig.pub).value;
+    const product = asPlaintext((m1 * m2) % n, n);
+    // An attacker with no key can forge Enc(m1·m2) from the two ciphertexts.
+    expect((c1 * c2) % n).toBe(encrypt(product, kBig.pub).value);
+  });
+});
+
+describe('textbook RSA signatures are existentially forgeable (README claim)', () => {
+  it('a product of two valid signatures verifies against the product digest', () => {
+    // Because s = H(m)^d, the product s1·s2 is a valid signature over H(m1)·H(m2).
+    // This multiplicative structure is exactly why real RSA uses PSS padding.
+    const n = k.pub.n;
+    const { signature: s1, digest: h1 } = sign('alpha', k.priv);
+    const { signature: s2, digest: h2 } = sign('beta', k.priv);
+    const forgedSig = (s1 * s2) % n;
+    const forgedDigest = (h1 * h2) % n;
+    // s_forged^e mod n must equal the forged digest — a signature no honest
+    // signer ever computed, yet the raw verifier accepts as consistent.
+    expect(modexp(forgedSig, k.pub.e, n)).toBe(forgedDigest);
+  });
 });
 
 describe('break demo (the weak-key claim, Invariant #5)', () => {

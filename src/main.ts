@@ -5,6 +5,7 @@ import { encryptDecryptPanel } from './ui/encrypt-decrypt';
 import { signVerifyPanel } from './ui/sign-verify';
 import { whatBreaksPanel } from './ui/what-breaks';
 import { realWorldPanel } from './ui/real-world';
+import { relatedPanel } from './ui/related';
 
 const app = document.getElementById('app');
 if (!app) throw new Error('#app mount point missing');
@@ -17,6 +18,7 @@ app.append(
   signVerifyPanel(),
   whatBreaksPanel(),
   realWorldPanel(),
+  relatedPanel(),
 );
 
 function introHeader(): HTMLElement {

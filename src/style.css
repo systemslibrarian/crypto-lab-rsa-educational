@@ -201,3 +201,9 @@ input.text { min-width: 12rem; width: 100%; }
   color: var(--text-muted);
   margin-top: 2rem;
 }
+
+/* Related demos footer list */
+.related-list { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; gap: 0.6rem; }
+.related-list li { line-height: 1.4; }
+.related-list a { font-weight: 600; }
+.related-blurb { color: var(--text-muted); font-size: 0.9rem; }
