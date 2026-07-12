@@ -22,11 +22,20 @@ app.append(
 );
 
 function introHeader(): HTMLElement {
-  const h = document.createElement('div');
-  h.className = 'intro';
+  const h = document.createElement('header');
+  h.className = 'cl-hero';
   h.innerHTML = `
-    <h1>Educational RSA</h1>
-    <p class="subtitle">Walk through RSA with real (small) numbers — generate a key, encrypt, sign,
-    then watch a weak key get factored while a 2048-bit key holds.</p>`;
+    <div class="cl-hero-main">
+      <h1 class="cl-hero-title">RSA</h1>
+      <p class="cl-hero-sub">Public-Key Cryptosystem · multiply-easy / factor-hard trapdoor</p>
+      <p class="cl-hero-desc">Generate a key (n, φ, e, d) from real small primes, then encrypt, decrypt,
+      and sign step by step — and watch a weak key get factored while a 2048-bit key holds.</p>
+    </div>
+    <aside class="cl-hero-why" aria-label="Why it matters">
+      <span class="cl-hero-why-label">WHY IT MATTERS</span>
+      <p class="cl-hero-why-text">RSA secures TLS handshakes, code signing, and email. Its safety rests
+      entirely on factoring being infeasible at scale — and on padding like OAEP, since textbook RSA is
+      broken in practice.</p>
+    </aside>`;
   return h;
 }
