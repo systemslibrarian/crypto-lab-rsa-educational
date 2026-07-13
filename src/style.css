@@ -206,6 +206,119 @@ input.text { min-width: 12rem; width: 100%; }
   margin-top: 2rem;
 }
 
+/* Status forward-link (keygen error → factoring) */
+.status-link { display: inline-block; margin-top: 0.35rem; font-size: 0.85rem; font-weight: 600; color: var(--link); }
+.status.bad .status-link { color: var(--link); }
+
+/* φ aside gloss */
+.phi-aside {
+  margin-top: 1rem;
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  background: color-mix(in oklab, var(--accent) 6%, transparent);
+}
+.phi-aside__tag { display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; color: var(--text-muted); }
+.phi-aside p { margin: 0.3rem 0 0; font-size: 0.92rem; color: var(--text); }
+
+/* Text → integer encoding explainer */
+.enc-explain { border: 1px dashed var(--border-color); border-radius: 8px; padding: 0.6rem 0.8rem; }
+.enc-explain__cap { margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--text-muted); }
+.enc-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.enc-chip {
+  display: inline-flex; flex-direction: column; align-items: center;
+  border: 1px solid var(--border-color); border-radius: 6px; padding: 0.25rem 0.5rem;
+  background: var(--bg-inset); min-width: 2.4rem;
+}
+.enc-chip__ch { font-weight: 700; font-size: 1rem; color: var(--text); }
+.enc-chip__code { font-size: 0.78rem; color: var(--text-muted); }
+.enc-chip.empty { color: var(--text-muted); font-family: var(--mono); }
+.enc-explain__result { margin: 0.5rem 0 0; font-size: 0.9rem; color: var(--text); word-break: break-all; }
+
+/* Square-and-multiply progressive visual */
+.sam-wrap { display: grid; gap: 0.6rem; }
+.sam-controls { margin: 0; gap: 0.5rem; }
+.sam-head p { margin: 0 0 0.5rem; font-size: 0.9rem; }
+.sam-lesson { color: var(--text); }
+.sam-lesson__x { font-weight: 700; color: var(--warn); }
+.sam-strip-cap { font-size: 0.82rem; color: var(--text-muted); }
+.sam-bits { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.6rem; }
+.sam-bit {
+  display: inline-flex; flex-direction: column; align-items: center;
+  border-radius: 6px; padding: 0.2rem 0.45rem; min-width: 1.9rem;
+  border: 1px solid var(--border-color); font-family: var(--mono);
+}
+.sam-bit__val { font-size: 1rem; font-weight: 700; }
+.sam-bit__idx { font-size: 0.68rem; color: var(--text-muted); }
+.sam-bit.one { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 16%, transparent); }
+.sam-bit.one .sam-bit__val { color: var(--text); }
+.sam-bit.zero { opacity: 0.6; }
+.sam-rows { display: grid; gap: 0.2rem; }
+.sam-row { display: grid; grid-template-columns: 6.5rem 1fr auto auto; gap: 0.6rem; align-items: baseline; font-size: 0.85rem; padding: 0.25rem 0.4rem; border-radius: 6px; }
+.sam-row.used { background: color-mix(in oklab, var(--accent) 9%, transparent); }
+.sam-row__act { color: var(--text); }
+.sam-row.skip .sam-row__act { color: var(--text-muted); }
+
+/* Round-trip flow diagram */
+.rt-subhead { margin: 1.5rem 0 0.4rem; font-size: 1.1rem; }
+.flow-host { margin: 0.5rem 0 0.5rem; }
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.4rem; justify-content: center; }
+.flow-node {
+  display: flex; flex-direction: column; gap: 0.15rem; justify-content: center;
+  border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem 0.7rem;
+  background: var(--bg-inset); text-align: center; min-width: 4.5rem;
+}
+.flow-node__top { font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+.flow-node__main { font-size: 0.9rem; color: var(--text); word-break: break-all; }
+.flow-node.cipher { border-color: var(--warn); }
+.flow-node.ok { border-color: var(--good); }
+.flow-node.bad { border-color: var(--bad); }
+.flow-arrow { display: flex; align-items: center; color: var(--text-muted); font-size: 1.2rem; padding: 0 0.1rem; }
+.flow-op { display: flex; align-items: center; gap: 0.3rem; }
+.flow-op__box {
+  display: flex; flex-direction: column; gap: 0.2rem; align-items: center;
+  border-radius: 8px; padding: 0.5rem 0.7rem; text-align: center;
+}
+.flow-op__box.pub { border: 1px solid var(--good); background: var(--good-bg); }
+.flow-op__box.priv { border: 1px solid var(--accent); background: var(--warn-bg); }
+.flow-op__title { font-size: 0.82rem; color: var(--text); }
+.flow-key-tag { font-size: 0.72rem; font-weight: 700; }
+.flow-key-tag.pub { color: var(--good); }
+.flow-key-tag.priv { color: var(--warn); }
+
+/* mod-n clock visualization */
+.clock-wrap { display: grid; grid-template-columns: minmax(240px, 300px) 1fr; gap: 1rem; align-items: start; }
+.clock-figure { display: grid; gap: 0.5rem; justify-items: center; }
+.clock-svg { width: 100%; max-width: 300px; height: auto; }
+.clock-ring { fill: none; stroke: var(--border-color); stroke-width: 1.5; }
+.clock-tick { fill: var(--text-muted); }
+.clock-dot.m { fill: var(--accent); }
+.clock-dot.c { fill: var(--warn); }
+.clock-label { font-family: var(--mono); font-size: 8px; font-weight: 700; fill: var(--text); }
+.clock-chord { stroke-width: 2.2; fill: none; }
+.clock-chord.enc { stroke: var(--accent); }
+.clock-chord.dec { stroke: var(--good); stroke-dasharray: 4 3; }
+.clock-legend { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; font-size: 0.8rem; color: var(--text-muted); justify-content: center; }
+.clock-legend__item { display: inline-flex; align-items: center; gap: 0.3rem; }
+.clock-legend__swatch { width: 0.8rem; height: 0.8rem; border-radius: 50%; display: inline-block; }
+.clock-legend__swatch.m { background: var(--accent); }
+.clock-legend__swatch.c { background: var(--warn); }
+.clock-legend__swatch.enc { background: var(--accent); }
+.clock-legend__swatch.dec { background: var(--good); }
+.clock-legend__swatch.is-line { width: 1.1rem; height: 0.2rem; border-radius: 2px; }
+.clock-identity { border: 1px solid var(--border-color); border-radius: 10px; padding: 0.9rem 1rem; background: var(--bg-inset); }
+.clock-identity__eq { margin: 0 0 0.35rem; font-size: 0.95rem; word-break: break-all; }
+.clock-identity__eq.hl { color: var(--warn); font-weight: 700; }
+.clock-identity__note { margin: 0.5rem 0 0; font-size: 0.9rem; color: var(--text); }
+
+@media (max-width: 640px) {
+  .clock-wrap { grid-template-columns: 1fr; }
+  .sam-row { grid-template-columns: 1fr 1fr; }
+  .flow { flex-direction: column; align-items: stretch; }
+  .flow-arrow { justify-content: center; transform: rotate(90deg); }
+}
+
 /* Related demos footer list */
 .related-list { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; gap: 0.6rem; }
 .related-list li { line-height: 1.4; }

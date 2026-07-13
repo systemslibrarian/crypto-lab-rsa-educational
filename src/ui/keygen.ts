@@ -42,7 +42,15 @@ export function keygenPanel(): HTMLElement {
     } catch (err) {
       status.className = 'status bad';
       const msg = err instanceof KeygenError ? err.message : (err as Error).message;
-      status.replaceChildren(el('span', {}, ['⚠ ' + msg]));
+      const kids: Array<Node | string> = [el('span', {}, ['⚠ ' + msg])];
+      if (err instanceof KeygenError) {
+        kids.push(
+          el('a', { class: 'status-link', href: '#breaks' }, [
+            '→ See exactly how a weak modulus falls in Section 5',
+          ]),
+        );
+      }
+      status.replaceChildren(...kids);
       clear(trace);
     }
   }
@@ -89,6 +97,7 @@ export function keygenPanel(): HTMLElement {
     ]),
     status,
     trace,
+    phiAside(),
   ]);
 
   // initial render
@@ -96,6 +105,23 @@ export function keygenPanel(): HTMLElement {
   eSelect.value = '17';
   build();
   return panel;
+}
+
+/** Plain-language gloss for the least-motivated symbol in the flow: φ(n). */
+function phiAside(): HTMLElement {
+  return el('aside', { class: 'phi-aside', 'aria-label': 'What φ(n) means' }, [
+    el('span', { class: 'phi-aside__tag' }, ['WHAT IS φ?']),
+    el('p', {}, [
+      el('strong', {}, ['φ(n)']),
+      ' counts how many numbers below n share ',
+      el('em', {}, ['no']),
+      ' common factor with n. For n = p·q that is exactly (p−1)(q−1). ',
+      'It is the size of the group of invertible residues, so exponents ',
+      'repeat with period φ — which is why d is taken as the inverse of e ',
+      el('strong', {}, ['mod φ']),
+      ', not mod n: we are inverting e in the exponent, and exponents live mod φ.',
+    ]),
+  ]);
 }
 
 function labelled(text: string, control: HTMLElement): HTMLElement {

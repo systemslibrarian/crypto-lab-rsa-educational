@@ -1,19 +1,23 @@
 // Section 6 — Real-world RSA: textbook determinism (a leak) vs randomized OAEP.
 
-import { encodeMessage, encrypt } from '../rsa/textbook';
+import { encodeMessage, encrypt, decrypt } from '../rsa/textbook';
+import { asPlaintext } from '../rsa/types';
 import { generateOaepKey, oaepEncrypt, toHex } from '../rsa/oaep';
 import type { OaepKey } from '../rsa/oaep';
 import { el, clear, codeBox } from './dom';
 import { LINKS } from '../rsa/links';
 import { onKey } from './store';
+import type { Keypair } from '../rsa/types';
 
 export function realWorldPanel(): HTMLElement {
   const out = el('div', { class: 'io-out' });
+  const malleHost = el('div', { class: 'io-out' });
   const status = el('div', { class: 'status', role: 'status', 'aria-live': 'polite' });
   let oaepKey: OaepKey | null = null;
 
   let render = () => {};
   onKey((k) => {
+    renderMalleability(malleHost, k);
     render = () => {
       clear(out);
       // Textbook: encrypt the SAME plaintext twice → identical ciphertext (leaks equality).
@@ -65,10 +69,60 @@ export function realWorldPanel(): HTMLElement {
     ]),
     status,
     out,
+    el('h3', { class: 'rt-subhead' }, ['A second reason: textbook RSA is malleable']),
+    el('p', { class: 'lede' }, [
+      'An attacker who never sees the key can still ',
+      el('em', {}, ['multiply']),
+      ' two ciphertexts and get the encryption of the product of the plaintexts — ',
+      el('span', { class: 'mono' }, ['Enc(a)·Enc(b) mod n = Enc(a·b)']),
+      '. Watch it happen on your key, then note how OAEP’s all-or-nothing padding destroys the structure.',
+    ]),
+    malleHost,
     el('p', { class: 'fine' }, [
       'Padding also defends against subtle attacks (e.g. Bleichenbacher padding oracles) — covered at depth in the ',
       el('a', { href: LINKS.rsaForge, target: '_blank', rel: 'noopener' }, ['RSA Forge lab']),
       '. Production code should always use OAEP (encryption) or PSS (signatures), never raw RSA.',
     ]),
   ]);
+}
+
+/**
+ * Live malleability demo: encrypt two plaintexts a and b, MULTIPLY the ciphertexts
+ * mod n, decrypt the product, and show it equals a·b mod n — proving an attacker
+ * with no key can forge Enc(a·b) from Enc(a) and Enc(b). All real modexp; nothing
+ * faked. a and b are chosen so a·b < n so the product is recovered exactly.
+ */
+function renderMalleability(host: HTMLElement, k: Keypair): void {
+  clear(host);
+  const n = k.pub.n;
+  // Choose two small factors whose product stays below n (so a·b mod n = a·b).
+  let a = 3n;
+  let b = 5n;
+  if (a * b >= n) { a = 2n; b = n > 6n ? 3n : 2n; }
+  if (a >= n) a = n - 1n;
+  if (b >= n) b = n - 1n;
+
+  const ca = encrypt(asPlaintext(a % n, n), k.pub).value;
+  const cb = encrypt(asPlaintext(b % n, n), k.pub).value;
+  const cProduct = (ca * cb) % n;           // attacker multiplies ciphertexts — no key needed
+  const recovered = decrypt(cProduct, k.priv).value; // what the product decrypts to
+  const expected = (a * b) % n;             // product of the plaintexts
+  const match = recovered === expected;
+
+  host.append(
+    el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, [`a = ${a},  Enc(a)`]), codeBox(ca.toString(), 'ca')]),
+    el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, [`b = ${b},  Enc(b)`]), codeBox(cb.toString(), 'cb')]),
+    el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['Attacker multiplies: Enc(a)·Enc(b) mod n']), codeBox(cProduct.toString(), 'product')]),
+    el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['That decrypts to']), codeBox(recovered.toString(), 'recovered')]),
+    el('div', { class: `verdict ${match ? 'bad' : 'good'}` }, [
+      match
+        ? `⚠ Equals a·b = ${a}·${b} = ${expected} — the attacker forged Enc(a·b) without the key`
+        : 'unexpected',
+    ]),
+    el('p', { class: 'fine' }, [
+      'OAEP prepends a random seed and a hash-based mask before exponentiating, so a ',
+      'ciphertext product decrypts to padding garbage that fails the integrity check — ',
+      'the homomorphic structure above is gone.',
+    ]),
+  );
 }

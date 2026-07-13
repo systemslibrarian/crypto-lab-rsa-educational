@@ -2,6 +2,7 @@ import './style.css';
 import { overviewPanel } from './ui/overview';
 import { keygenPanel } from './ui/keygen';
 import { encryptDecryptPanel } from './ui/encrypt-decrypt';
+import { roundTripPanel } from './ui/round-trip';
 import { signVerifyPanel } from './ui/sign-verify';
 import { whatBreaksPanel } from './ui/what-breaks';
 import { realWorldPanel } from './ui/real-world';
@@ -15,6 +16,7 @@ app.append(
   overviewPanel(),
   keygenPanel(),
   encryptDecryptPanel(),
+  roundTripPanel(),
   signVerifyPanel(),
   whatBreaksPanel(),
   realWorldPanel(),
