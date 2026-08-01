@@ -59,7 +59,7 @@ body {
   padding: 2rem 1.25rem 4rem;
 }
 
-/* BEGIN cl-hero standard — managed, keep in sync across fleet
+/* cl-hero
    Fleet vars mapped to this demo's theme: --text-dim -> --text-muted,
    --border -> --border-color. --text and --accent already match. */
 .cl-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:clamp(1rem,4vw,3rem);flex-wrap:wrap;margin:clamp(1rem,3vw,2rem) 0 1.5rem;}
@@ -71,7 +71,12 @@ body {
 .cl-hero-why-label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.14em;color:var(--text-muted);}
 .cl-hero-why-text{margin:.35rem 0 0;font-size:.95rem;line-height:1.5;color:var(--text);}
 @media (max-width:640px){.cl-hero{flex-direction:column;}.cl-hero-why{flex-basis:auto;width:100%;}}
-/* END cl-hero standard */
+
+/* Mobile: in the column layout the 22rem flex-basis becomes a minimum
+   HEIGHT, padding dead space above the fold. Reset it. */
+@media (max-width: 640px) {
+  .cl-hero-main { flex-basis: auto; min-width: 0; }
+}
 
 /* Panels */
 .panel {
@@ -124,6 +129,11 @@ input.text { min-width: 12rem; width: 100%; }
   padding: 0.55rem 0.9rem;
   font: inherit;
   cursor: pointer;
+  /* WCAG 2.5.5 target size */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .btn:hover { border-color: var(--accent); }
 .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -324,3 +334,15 @@ input.text { min-width: 12rem; width: 100%; }
 .related-list li { line-height: 1.4; }
 .related-list a { font-weight: 600; }
 .related-blurb { color: var(--text-muted); font-size: 0.9rem; }
+
+/* WCAG 2.3.3 — respect a reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
