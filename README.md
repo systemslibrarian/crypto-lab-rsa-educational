@@ -55,4 +55,6 @@ No environment variables are required. Run the crypto unit tests with `npm test`
 
 ---
 
+*One of 170+ browser demos in the [Crypto Lab](https://crypto-lab.systemslibrarian.dev/) suite.*
+
 *"Whether you eat or drink, or whatever you do, do all to the glory of God." — 1 Corinthians 10:31*
