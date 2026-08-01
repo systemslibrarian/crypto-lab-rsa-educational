@@ -24,8 +24,8 @@ export function signVerifyPanel(): HTMLElement {
         : el('div', { class: 'verdict bad' }, ['✗ Signature INVALID — message was altered after signing']);
 
       out.append(
-        el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['H(message) signed']), codeBox(digest.toString(), 'digest')]),
-        el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['Signature s = H(m)^d mod n']), codeBox(signature.toString(), 'signature')]),
+        el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['H(message) signed — H = toy FNV-1a, not SHA-256']), codeBox(digest.toString(), 'digest')]),
+        el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['Signature s = H(m)^d mod n  (H = toy hash)']), codeBox(signature.toString(), 'signature')]),
         el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['Delivered message verifier sees']), codeBox(delivered, 'message')]),
         el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['Recovered s^e mod n vs fresh H(m)']), codeBox(`${res.recovered}  vs  ${res.expected}`, 'check')]),
         verdict,
@@ -43,6 +43,11 @@ export function signVerifyPanel(): HTMLElement {
     el('div', { class: 'controls' }, [
       el('div', { class: 'field grow' }, [el('label', { for: 'sv-msg' }, ['Message to sign']), msg]),
       el('label', { class: 'check', for: 'sv-tamper' }, [tamper, ' Tamper with the message after signing']),
+    ]),
+    el('div', { class: 'status warn' }, [
+      el('span', {}, [
+        '⚠ Textbook RSA signing — no padding (no PKCS#1 v1.5, no PSS), and H is a 64-bit FNV-1a toy hash, not a cryptographic one. It is not collision resistant, so these signatures are forgeable. Teaching only.',
+      ]),
     ]),
     out,
   ]);

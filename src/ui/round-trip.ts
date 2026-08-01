@@ -223,6 +223,15 @@ function renderClock(k: Keypair, m: bigint, c: bigint, back: bigint): HTMLElemen
       el('span', { class: 'mono' }, ['e·d mod φ = 1']),
       ' in Section 2 was quietly guaranteeing.',
     ]),
+    el('p', { class: 'clock-identity__note fine' }, [
+      'Strictly: Euler’s theorem needs ',
+      el('span', { class: 'mono' }, ['gcd(m, n) = 1']),
+      ', which covers almost every m but not all of them. The proof that holds for ',
+      el('strong', {}, ['every']),
+      ' m < n runs the same argument separately mod p and mod q with Fermat’s little theorem — each congruence stays true even when p or q divides m — and the Chinese Remainder Theorem stitches the two halves back into ',
+      el('span', { class: 'mono' }, ['m^(e·d) = m mod n']),
+      '.',
+    ]),
   ]);
 
   const legend = el('div', { class: 'clock-legend' }, [

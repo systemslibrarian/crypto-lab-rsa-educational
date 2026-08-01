@@ -51,7 +51,7 @@ export function relatedPanel(): HTMLElement {
       ),
     ),
     el('p', { class: 'fine' }, [
-      'One of 120+ live browser demos in the ',
+      'One of 170+ live browser demos in the ',
       el('a', { href: LINKS.suite, target: '_blank', rel: 'noopener' }, ['Crypto Lab suite']),
       '.',
     ]),
