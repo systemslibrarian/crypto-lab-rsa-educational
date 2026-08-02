@@ -9,6 +9,7 @@
   --bg-elev: #161b22;
   --bg-inset: #0a0d12;
   --border-color: #2a313c;
+  --control-border: #596574;
   --text: #e6edf3;
   --text-muted: #9aa6b2;
   --good: #3fb950;
@@ -27,6 +28,7 @@
   --bg-elev: #ffffff;
   --bg-inset: #eef1f4;
   --border-color: #d0d7de;
+  --control-border: #6c7782;
   --text: #1f2328;
   --text-muted: #59636e;
   /* Amber reads at only ~2.1:1 as text on a light page; use a darker "burnt"
@@ -111,7 +113,7 @@ a { color: var(--link); }
 .field label, .step__label { font-size: 0.85rem; color: var(--text-muted); }
 input, select {
   background: var(--bg-inset);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--control-border);
   color: var(--text);
   border-radius: 8px;
   padding: 0.5rem 0.6rem;
