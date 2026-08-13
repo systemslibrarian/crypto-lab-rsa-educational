@@ -16,6 +16,14 @@ export function whatBreaksPanel(): HTMLElement {
   onKey((k) => {
     renderSmall = () => {
       clear(small);
+      // `out` is a persistent node re-appended below, so clearing `small` alone
+      // does NOT clear it: a previous break result survived the key change and
+      // stayed on screen under the new card. A learner who factored n = 67591
+      // and then generated a smaller key saw "Your key — n = 15" directly above
+      // "Recovered primes p, q: 257 × 263" and a reconstructed d for a modulus
+      // no longer displayed anywhere. A stale result is worse than none here,
+      // because the whole panel's claim is that THIS key is the one that fell.
+      clear(out);
       small.append(
         el('h3', {}, ['Your key — ', el('span', { class: 'mono' }, [`n = ${k.pub.n}`])]),
         el('p', {}, [`${k.pub.n.toString(2).length} bits. Small enough to factor on this page.`]),

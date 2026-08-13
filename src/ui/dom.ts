@@ -37,9 +37,35 @@ export function disclosure(summary: string, body: Node): HTMLDetailsElement {
   return d;
 }
 
-/** Monospace, horizontally-scrollable value box with a copy button (a11y/mobile rule). */
+/**
+ * Monospace, horizontally-scrollable value box with a copy button (a11y/mobile rule).
+ *
+ * The box is `overflow-x: auto` around a `white-space: nowrap` run, so at phone
+ * width almost every value this lab generates makes it scroll for real — which
+ * makes it a SCROLLING REGION that has to be operable from a keyboard (WCAG
+ * 2.1.1), and it holds nothing focusable of its own: the Copy button is its
+ * SIBLING, not its child. So it gets a tab stop, and a tab stop has to be named
+ * and has to show where the focus is:
+ *
+ *  - `role="group"` is what makes the `aria-label` legal. An `aria-label` on a
+ *    role-less element is PROHIBITED and silently discarded — axe files that
+ *    under `incomplete`, never under `violations` — and `<code>` exposes the
+ *    `code` role, which does not support naming either. `group` does, and it is
+ *    the right shape for a small scroller: `role="region"` would turn every one
+ *    of these into a landmark and they would collide under `landmark-unique`.
+ *  - `.codebox__value:focus-visible` in `style.css` draws the indicator (2.4.7).
+ *    Making something focusable and leaving it without one is a defect
+ *    introduced by the fix.
+ *
+ * This was invisible until the 1.4.10 reflow fix landed, because until then the
+ * box was never narrower than its content and so never scrolled at all.
+ */
 export function codeBox(value: string, label?: string): HTMLElement {
-  const pre = el('code', { class: 'codebox__value' }, [value]);
+  const pre = el(
+    'code',
+    { class: 'codebox__value', tabindex: '0', role: 'group', 'aria-label': label ?? 'value' },
+    [value],
+  );
   const copy = el(
     'button',
     {

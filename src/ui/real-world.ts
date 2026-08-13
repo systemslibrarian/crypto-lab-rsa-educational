@@ -21,15 +21,24 @@ export function realWorldPanel(): HTMLElement {
     render = () => {
       clear(out);
       // Textbook: encrypt the SAME plaintext twice → identical ciphertext (leaks equality).
-      // Use a message that fits the current (possibly tiny) key.
-      const text = k.pub.n > 0x4869n ? 'Hi' : 'H';
-      const m = encodeMessage(text, k.pub.n);
+      // Use a message that fits the current key. The third branch is load-bearing:
+      // a single 'H' encodes to m = 72, so for ANY key with n <= 72 — and p = 3,
+      // q = 5 is both the smallest key this lab can build and a perfectly valid
+      // one — asPlaintext threw a PlaintextRangeError straight out of this
+      // listener. setKey has no try/catch, so the rejection propagated back into
+      // keygenPanel's own catch, which painted "message m = 72 is not in range
+      // for n = 15" on the SECTION 2 status banner and abandoned the key: a valid
+      // keypair reported as a keygen failure, blamed on a panel four sections
+      // away. Fall back to a bare integer, the way roundTripPanel already did.
+      const text = k.pub.n > 0x4869n ? 'Hi' : k.pub.n > 0x48n ? 'H' : '';
+      const m = text ? encodeMessage(text, k.pub.n) : asPlaintext(k.pub.n > 2n ? 2n : 0n, k.pub.n);
+      const shown = text ? `"${text}"` : `m = ${m}`;
       const c1 = encrypt(m, k.pub).value;
       const c2 = encrypt(m, k.pub).value;
       out.append(
         el('h3', { class: 'warn-h' }, ['⚠ Textbook RSA — deterministic']),
-        el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, [`Encrypt "${text}" once`]), codeBox(c1.toString(), 'c1')]),
-        el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, [`Encrypt "${text}" again`]), codeBox(c2.toString(), 'c2')]),
+        el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, [`Encrypt ${shown} once`]), codeBox(c1.toString(), 'c1')]),
+        el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, [`Encrypt ${shown} again`]), codeBox(c2.toString(), 'c2')]),
         el('div', { class: 'verdict bad' }, [
           c1 === c2 ? '✗ Identical ciphertext — an eavesdropper learns the two messages are equal' : 'unexpected',
         ]),
