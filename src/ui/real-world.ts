@@ -74,7 +74,7 @@ export function realWorldPanel(): HTMLElement {
     el('h2', {}, ['6 · Why real RSA adds padding']),
     el('p', { class: 'lede' }, ['Raw RSA is deterministic: the same message always encrypts to the same ciphertext, leaking when two messages match. Real RSA (OAEP) adds randomness so every encryption differs.']),
     el('div', { class: 'controls' }, [
-      el('button', { type: 'button', class: 'btn primary', onclick: () => runOaep() }, ['Run the real OAEP comparison']),
+      el('button', { id: 'rw-run-oaep', type: 'button', class: 'btn primary', onclick: () => runOaep() }, ['Run the real OAEP comparison']),
     ]),
     status,
     out,
