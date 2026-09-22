@@ -28,6 +28,7 @@ export function whatBreaksPanel(): HTMLElement {
         el('h3', {}, ['Your key — ', el('span', { class: 'mono' }, [`n = ${k.pub.n}`])]),
         el('p', {}, [`${k.pub.n.toString(2).length} bits. Small enough to factor on this page.`]),
         el('button', {
+          id: 'wb-factor',
           type: 'button',
           class: 'btn danger',
           onclick: () => runBreak(k.pub.n, k.pub.e),
@@ -66,7 +67,7 @@ export function whatBreaksPanel(): HTMLElement {
     big.append(
       el('h3', {}, ['A real key — ', el('span', { class: 'mono' }, ['n = 2048 bits'])]),
       el('p', {}, ['617 decimal digits. The “Factor it!” button is deliberately disabled here.']),
-      el('button', { type: 'button', class: 'btn', disabled: true }, ['Factor it (infeasible)']),
+      el('button', { id: 'wb-factor-2048', type: 'button', class: 'btn', disabled: true }, ['Factor it (infeasible)']),
       el('div', { class: 'verdict good' }, ['✓ SECURE — factoring is computationally infeasible']),
       el('p', { class: 'fine' }, [
         `Projected cost (GNFS heuristic, 10¹² ops/sec): ~10`,

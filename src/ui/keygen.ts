@@ -70,8 +70,9 @@ export function keygenPanel(): HTMLElement {
       labelled('Prime p', pInput),
       labelled('Prime q', qInput),
       labelled('Exponent e', eSelect),
-      el('button', { type: 'button', class: 'btn primary', onclick: build }, ['Generate']),
+      el('button', { id: 'kg-generate', type: 'button', class: 'btn primary', onclick: build }, ['Generate']),
       el('button', {
+        id: 'kg-random',
         type: 'button',
         class: 'btn',
         onclick: () => {
@@ -84,6 +85,7 @@ export function keygenPanel(): HTMLElement {
         },
       }, ['🎲 Roll random primes']),
       el('button', {
+        id: 'kg-weak',
         type: 'button',
         class: 'btn ghost',
         title: 'A deliberately weak choice',

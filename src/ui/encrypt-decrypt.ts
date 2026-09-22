@@ -28,7 +28,7 @@ export function encryptDecryptPanel(): HTMLElement {
           explainEncoding(msg.value, m),
           row('Ciphertext c = m^e mod n', c.value.toString()),
           row('Decrypted c^d mod n', `${back.value}  →  "${decodeMessage(back.value)}"`, back.value === m),
-          disclosure('Show the encryption math (square-and-multiply)', samHost(m, k.pub.e, k.pub.n)),
+          disclosure('Show the encryption math (square-and-multiply)', samHost(m, k.pub.e, k.pub.n), 'ed-math-toggle'),
         );
         status.className = 'status warn';
         status.replaceChildren(el('span', {}, ['⚠ Textbook RSA — no padding. Teaching only, never use raw RSA for real messages.']));
@@ -95,8 +95,8 @@ function samHost(m: bigint, realE: bigint, n: bigint): HTMLElement {
     view.append(renderModexp(m, e, n, steps));
   };
 
-  const tinyBtn = el('button', { type: 'button', class: 'btn primary', onclick: () => { setActive(tinyBtn); render(3n); } }, ['Tiny exponent (e = 3)']);
-  const realBtn = el('button', { type: 'button', class: 'btn', onclick: () => { setActive(realBtn); render(realE); } }, [`Real key exponent (e = ${realE})`]);
+  const tinyBtn = el('button', { id: 'ed-e-tiny', type: 'button', class: 'btn primary', onclick: () => { setActive(tinyBtn); render(3n); } }, ['Tiny exponent (e = 3)']);
+  const realBtn = el('button', { id: 'ed-e-real', type: 'button', class: 'btn', onclick: () => { setActive(realBtn); render(realE); } }, [`Real key exponent (e = ${realE})`]);
 
   function setActive(active: HTMLElement): void {
     for (const b of [tinyBtn, realBtn]) {

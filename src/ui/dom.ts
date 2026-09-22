@@ -31,9 +31,9 @@ export function clear(node: HTMLElement): void {
 }
 
 /** A collapsible <details> block for the expandable math traces. */
-export function disclosure(summary: string, body: Node): HTMLDetailsElement {
+export function disclosure(summary: string, body: Node, summaryId?: string): HTMLDetailsElement {
   const d = el('details', { class: 'trace' });
-  d.append(el('summary', {}, [summary]), body);
+  d.append(el('summary', summaryId ? { id: summaryId } : {}, [summary]), body);
   return d;
 }
 

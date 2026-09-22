@@ -242,6 +242,7 @@ function renderClock(k: Keypair, m: bigint, c: bigint, back: bigint): HTMLElemen
   ]);
 
   const replay = el('button', {
+    id: 'rt-replay',
     type: 'button',
     class: 'btn',
     onclick: () => animate(encChord, decChord, svg),
