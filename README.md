@@ -20,6 +20,7 @@ Generate a keypair from two small primes (or roll random ones) and watch every s
 
 ## What Can Go Wrong
 
+- **The teaching text encoding is limited** — the encrypt/decrypt playground packs short ASCII text (codes 0–127) in base-256. Non-ASCII text and a leading NUL (zero byte) are visibly rejected: an integer alone cannot preserve leading zero bytes. Empty text maps to zero, and the packed integer must still be smaller than `n`. This encoding is for inspecting textbook RSA arithmetic; it is not a general message format.
 - **Textbook (unpadded) RSA is deterministic** — the same plaintext always encrypts to the same ciphertext, so an eavesdropper learns when two messages are equal. Section 6 of the demo shows this directly, then contrasts it with randomized RSA-OAEP. Real systems must use OAEP for encryption.
 - **Textbook RSA is malleable** — because `Enc(m₁)·Enc(m₂) mod n = Enc(m₁·m₂)`, an attacker can transform ciphertexts into related ciphertexts without the key. OAEP's all-or-nothing padding destroys this homomorphic structure.
 - **Weak primes are catastrophic** — if `p` and `q` are small, close together, or share factors with other moduli, `n` factors in milliseconds. The demo factors a weak key with trial division and Pollard's rho, recovers `d`, and decrypts — while a 2048-bit key does not budge.
