@@ -60,14 +60,24 @@ export function verify(message: string, signature: bigint, pub: PublicKey): { ok
   return { ok: recovered === expected, recovered, expected };
 }
 
-/** Encode a short ASCII string as a single integer < n, or throw via asPlaintext. */
+/**
+ * Pack short ASCII text in base-256. Empty text maps to zero; a leading NUL is
+ * rejected because integers carry no byte length and would lose that zero byte.
+ * Reject unsupported text before packing, then enforce m < n via asPlaintext.
+ */
 export function encodeMessage(text: string, n: bigint): Plaintext {
+  if (/[^\x00-\x7f]/.test(text)) {
+    throw new Error('This teaching encoding supports ASCII only (character codes 0–127). Use a short ASCII message.');
+  }
+  if (text.startsWith('\0')) {
+    throw new Error('This teaching encoding cannot preserve a leading NUL (zero byte). Remove it before encrypting.');
+  }
   let acc = 0n;
-  for (let i = 0; i < text.length; i++) acc = (acc << 8n) | BigInt(text.charCodeAt(i) & 0xff);
+  for (let i = 0; i < text.length; i++) acc = (acc << 8n) | BigInt(text.charCodeAt(i));
   return asPlaintext(acc, n);
 }
 
-/** Inverse of encodeMessage. */
+/** Inverse for text accepted by encodeMessage, including empty text. */
 export function decodeMessage(m: bigint): string {
   if (m === 0n) return '';
   const bytes: number[] = [];

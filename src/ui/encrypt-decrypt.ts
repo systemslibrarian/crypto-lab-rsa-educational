@@ -45,9 +45,9 @@ export function encryptDecryptPanel(): HTMLElement {
 
   return el('section', { class: 'panel', id: 'encrypt' }, [
     el('h2', {}, ['3 · Encrypt & decrypt']),
-    el('p', { class: 'lede' }, ['Type a short message. It is encoded as an integer m < n, encrypted with (n, e), and decrypted back with d.']),
+    el('p', { class: 'lede' }, ['Type a short ASCII message (character codes 0–127), with no leading NUL (zero byte). It is encoded as an integer m < n, encrypted with (n, e), and decrypted back with d. Other text is rejected rather than changed.']),
     el('div', { class: 'controls' }, [
-      el('div', { class: 'field' }, [el('label', { for: 'ed-msg' }, ['Message (short)']), msg]),
+      el('div', { class: 'field' }, [el('label', { for: 'ed-msg' }, ['Message (short ASCII)']), msg]),
     ]),
     status,
     out,
@@ -66,7 +66,7 @@ function row(label: string, value: string, ok?: boolean): HTMLElement {
 function explainEncoding(text: string, m: bigint): HTMLElement {
   const chars = [...text].slice(0, 8);
   const parts = chars.map((ch) => {
-    const code = ch.charCodeAt(0) & 0xff;
+    const code = ch.charCodeAt(0);
     return el('span', { class: 'enc-chip' }, [
       el('span', { class: 'enc-chip__ch' }, [ch === ' ' ? '␣' : ch]),
       el('span', { class: 'enc-chip__code mono' }, [String(code)]),

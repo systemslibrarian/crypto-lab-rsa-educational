@@ -73,6 +73,36 @@ describe('encrypt/decrypt round-trip (Invariant #3)', () => {
   });
 });
 
+describe('text encoding boundaries', () => {
+  it('preserves the known Hi encoding and empty text', () => {
+    expect(encodeMessage('Hi', kBig.pub.n)).toBe(18537n);
+    expect(decodeMessage(encodeMessage('', kBig.pub.n))).toBe('');
+  });
+
+  it('round-trips every nonzero ASCII byte through RSA', () => {
+    for (let code = 1; code <= 127; code++) {
+      const text = String.fromCharCode(code);
+      const m = encodeMessage(text, kBig.pub.n);
+      expect(decodeMessage(decrypt(encrypt(m, kBig.pub).value, kBig.priv).value)).toBe(text);
+    }
+  });
+
+  it('preserves internal and trailing zero bytes', () => {
+    for (const text of ['H\0', 'H\0i']) {
+      const m = encodeMessage(text, 1n << 24n);
+      expect(decodeMessage(m)).toBe(text);
+    }
+  });
+
+  it.each(['Ā', 'é', '😀', '\ud800', 'HĀ'])('rejects non-ASCII input %j instead of truncating', (text) => {
+    expect(() => encodeMessage(text, kBig.pub.n)).toThrow(/ASCII/);
+  });
+
+  it.each(['\0', '\0Hi', '\0\0'])('rejects leading zero bytes %j instead of dropping them', (text) => {
+    expect(() => encodeMessage(text, kBig.pub.n)).toThrow(/leading NUL/);
+  });
+});
+
 describe('plaintext range (Invariant #6)', () => {
   it('rejects m ≥ n instead of silently wrapping', () => {
     expect(() => asPlaintext(k.pub.n, k.pub.n)).toThrow(PlaintextRangeError);

@@ -151,6 +151,26 @@ test('encrypt/decrypt round trip agrees with independently recomputed modexp', a
   await expect(ioRow(enc, 'Decrypted').locator('.codebox__value')).toContainText('"Hi"');
 });
 
+test('unsupported text is visibly rejected, clears stale output, and recovers', async ({ page }) => {
+  const enc = page.locator('#encrypt');
+  await expect(enc.locator('.lede')).toContainText('ASCII');
+  for (const text of ['Ā', 'é', '😀']) {
+    await page.locator('#ed-msg').fill(text);
+    await expect(enc.locator('.status')).toHaveClass(/bad/);
+    await expect(enc.locator('.status')).toContainText('ASCII only');
+    await expect(enc.locator('.io-row')).toHaveCount(0);
+  }
+  await page.locator('#ed-msg').evaluate((input: HTMLInputElement) => {
+    input.value = '\0Hi';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  await expect(enc.locator('.status')).toContainText('leading NUL');
+  await expect(enc.locator('.io-row')).toHaveCount(0);
+  await page.locator('#ed-msg').fill('Hi');
+  await expect(enc.locator('.status')).toHaveClass(/warn/);
+  await expect(ioRow(enc, 'Decrypted').locator('.codebox__value')).toContainText('"Hi"');
+});
+
 test('changing the message changes the ciphertext and still round-trips', async ({ page }) => {
   const k = await pageKey(page);
   const enc = page.locator('#encrypt');
