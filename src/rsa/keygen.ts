@@ -4,6 +4,13 @@
 import { gcd, isProbablePrime, modexp, modinv, randomPrime } from './bigint-math';
 import type { Keypair } from './types';
 
+// The UI renders the modulus on a Number-based clock and offers synchronous
+// trial division. Keeping each prime at or below 65,537 makes every accepted
+// modulus exactly representable as a Number and bounds that teaching work to a
+// small, responsive search. This is an application invariant, not an RSA limit.
+export const MAX_EDUCATIONAL_PRIME = 65_537n;
+export const MAX_RANDOM_BITS_PER_PRIME = 16;
+
 export interface KeygenStep {
   label: string;
   value: string;
@@ -41,6 +48,12 @@ export function validExponents(phi: bigint, limit = 12): bigint[] {
  * KeygenError with a teaching message on any violation.
  */
 export function generateKeypair(p: bigint, q: bigint, e: bigint): Keypair {
+  if (p > MAX_EDUCATIONAL_PRIME) {
+    throw new KeygenError(`p must be at most 65,537 in this browser demo so its clock stays exact and its factoring exercise remains responsive.`);
+  }
+  if (q > MAX_EDUCATIONAL_PRIME) {
+    throw new KeygenError(`q must be at most 65,537 in this browser demo so its clock stays exact and its factoring exercise remains responsive.`);
+  }
   if (!isProbablePrime(p)) throw new KeygenError(`p = ${p} is not prime. RSA's security and the φ formula both require p to be prime.`);
   if (!isProbablePrime(q)) throw new KeygenError(`q = ${q} is not prime. RSA's security and the φ formula both require q to be prime.`);
   if (p === q) throw new KeygenError(`p and q must be distinct. If p = q then n = p² is trivially factorable and φ = p(p−1), not (p−1)(q−1).`);
@@ -63,6 +76,9 @@ export function generateKeypair(p: bigint, q: bigint, e: bigint): Keypair {
 
 /** Generate a random small keypair near the requested bit-size per prime. */
 export function randomKeypair(bitsPerPrime = 16): Keypair {
+  if (!Number.isInteger(bitsPerPrime) || bitsPerPrime < 2 || bitsPerPrime > MAX_RANDOM_BITS_PER_PRIME) {
+    throw new KeygenError(`random educational primes must use between 2 and ${MAX_RANDOM_BITS_PER_PRIME} bits each.`);
+  }
   for (;;) {
     const p = randomPrime(bitsPerPrime);
     let q = randomPrime(bitsPerPrime);
