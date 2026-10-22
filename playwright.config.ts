@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 /**
  * E2E + accessibility gate. Tests run against the production build served by
@@ -22,5 +22,18 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:4362/crypto-lab-rsa-educational/',
     colorScheme: 'dark',
+    trace: 'on-first-retry',
   },
+  projects: [
+    {
+      name: 'a11y',
+      testMatch: /a11y\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'claims',
+      testMatch: /claims\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
 });

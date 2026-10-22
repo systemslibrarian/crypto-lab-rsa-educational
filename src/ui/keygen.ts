@@ -1,6 +1,13 @@
 // Section 2 — Interactive key generation. Owns the shared key (store).
 
-import { generateKeypair, keygenTrace, KeygenError, randomKeypair, validExponents } from '../rsa/keygen';
+import {
+  generateKeypair,
+  keygenTrace,
+  KeygenError,
+  MAX_EDUCATIONAL_PRIME,
+  randomKeypair,
+  validExponents,
+} from '../rsa/keygen';
 import { isProbablePrime } from '../rsa/bigint-math';
 import { el, clear } from './dom';
 import { renderSteps } from './step-trace';
@@ -11,16 +18,26 @@ const SMALL_PRIMES = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 5
 export function keygenPanel(): HTMLElement {
   // Defaults give n = 67591 (16 bits) — small enough to factor instantly, big enough
   // to hold a 2-character message so the encrypt/real-world panels work on first load.
-  const pInput = el('input', { type: 'number', id: 'kg-p', value: '257', min: '2', class: 'num' }) as HTMLInputElement;
-  const qInput = el('input', { type: 'number', id: 'kg-q', value: '263', min: '2', class: 'num' }) as HTMLInputElement;
+  const primeAttrs = { type: 'number', min: '2', max: MAX_EDUCATIONAL_PRIME.toString(), step: '1', inputmode: 'numeric', class: 'num' };
+  const pInput = el('input', { ...primeAttrs, id: 'kg-p', value: '257' }) as HTMLInputElement;
+  const qInput = el('input', { ...primeAttrs, id: 'kg-q', value: '263' }) as HTMLInputElement;
   const eSelect = el('select', { id: 'kg-e', class: 'num' }) as HTMLSelectElement;
   const status = el('div', { class: 'status', role: 'status', 'aria-live': 'polite' });
   const trace = el('div', { class: 'trace-host' });
 
   function refreshExponents(): void {
-    const p = BigInt(pInput.value || '0');
-    const q = BigInt(qInput.value || '0');
     clear(eSelect);
+    let p: bigint;
+    let q: bigint;
+    try {
+      p = readPrimeInput('p', pInput);
+      q = readPrimeInput('q', qInput);
+    } catch {
+      return;
+    }
+    // Reject the cheap range boundary before Miller-Rabin so a pasted enormous
+    // integer cannot turn an input event into expensive synchronous work.
+    if (p > MAX_EDUCATIONAL_PRIME || q > MAX_EDUCATIONAL_PRIME) return;
     if (!isProbablePrime(p) || !isProbablePrime(q) || p === q) return;
     const phi = (p - 1n) * (q - 1n);
     for (const e of validExponents(phi)) {
@@ -30,8 +47,8 @@ export function keygenPanel(): HTMLElement {
 
   function build(): void {
     try {
-      const p = BigInt(pInput.value);
-      const q = BigInt(qInput.value);
+      const p = readPrimeInput('p', pInput);
+      const q = readPrimeInput('q', qInput);
       const e = BigInt(eSelect.value || '0');
       const k = generateKeypair(p, q, e);
       setKey(k);
@@ -64,7 +81,7 @@ export function keygenPanel(): HTMLElement {
 
   const panel = el('section', { class: 'panel', id: 'keygen' }, [
     el('h2', {}, ['2 · Generate a key, step by step']),
-    el('p', { class: 'lede' }, ['Choose two small primes, or roll random ones. Every intermediate value is shown — nothing is hidden.']),
+    el('p', { class: 'lede' }, ['Choose two small primes from 2 through 65,537, or roll random ones. Every intermediate value is shown — nothing is hidden.']),
     datalist,
     el('div', { class: 'controls' }, [
       labelled('Prime p', pInput),
@@ -107,6 +124,14 @@ export function keygenPanel(): HTMLElement {
   eSelect.value = '17';
   build();
   return panel;
+}
+
+function readPrimeInput(label: 'p' | 'q', input: HTMLInputElement): bigint {
+  const raw = input.value.trim();
+  if (!/^\d+$/.test(raw)) {
+    throw new KeygenError(`${label} must be a whole decimal integer.`);
+  }
+  return BigInt(raw);
 }
 
 /** Plain-language gloss for the least-motivated symbol in the flow: φ(n). */

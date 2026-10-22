@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { generateKeypair, KeygenError, randomKeypair, selfCheck, validExponents } from './keygen';
+import {
+  generateKeypair,
+  KeygenError,
+  MAX_EDUCATIONAL_PRIME,
+  randomKeypair,
+  selfCheck,
+  validExponents,
+} from './keygen';
 import { decodeMessage, decrypt, encodeMessage, encrypt, sign, verify } from './textbook';
 import { asPlaintext, PlaintextRangeError } from './types';
 import { breakKey, factor, projectFactoringYears, recoverPrivateExponent } from './factor';
@@ -23,6 +30,18 @@ describe('keygen validation (Invariant #2)', () => {
 
   it('rejects p == q', () => {
     expect(() => generateKeypair(61n, 61n, 17n)).toThrow(/distinct/);
+  });
+
+  it('rejects primes above the responsive educational ceiling before primality work', () => {
+    expect(() => generateKeypair(MAX_EDUCATIONAL_PRIME + 1n, 53n, 17n)).toThrow(/p must be at most 65,537/);
+    expect(() => generateKeypair(61n, MAX_EDUCATIONAL_PRIME + 1n, 17n)).toThrow(/q must be at most 65,537/);
+    expect(() => randomKeypair(17)).toThrow(/between 2 and 16 bits/);
+  });
+
+  it('accepts the ceiling while keeping the largest modulus exactly representable', () => {
+    const edge = generateKeypair(MAX_EDUCATIONAL_PRIME, 65_521n, 17n);
+    expect(BigInt(Number(edge.pub.n))).toBe(edge.pub.n);
+    expect(edge.pub.n).toBeLessThan(1n << 53n);
   });
 
   it('rejects e with gcd(e, φ) ≠ 1', () => {
