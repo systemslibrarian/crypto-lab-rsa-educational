@@ -130,6 +130,24 @@ test('a composite p is rejected before any key exists', async ({ page }) => {
   await expect(page.locator('#keygen .steps')).toHaveCount(0);
 });
 
+test('oversized and non-integer prime inputs fail closed before expensive work', async ({ page }) => {
+  const p = page.locator('#kg-p');
+  await expect(p).toHaveAttribute('max', '65537');
+
+  await p.fill('65539');
+  await expect(page.locator('#kg-e option')).toHaveCount(0);
+  await page.getByRole('button', { name: /^Generate$/ }).click();
+  await expect(page.locator('#keygen .status')).toHaveClass(/bad/);
+  await expect(page.locator('#keygen .status')).toContainText('p must be at most 65,537');
+  await expect(page.locator('#keygen .steps')).toHaveCount(0);
+
+  await p.fill('1e3');
+  await expect(page.locator('#kg-e option')).toHaveCount(0);
+  await page.getByRole('button', { name: /^Generate$/ }).click();
+  await expect(page.locator('#keygen .status')).toContainText('p must be a whole decimal integer');
+  await expect(page.locator('#keygen .steps')).toHaveCount(0);
+});
+
 // ---------------------------------------------------------------- Section 3
 
 test('encrypt/decrypt round trip agrees with independently recomputed modexp', async ({ page }) => {
