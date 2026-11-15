@@ -30,11 +30,13 @@ Generate a keypair from two small primes between 2 and 65,537 (or roll random on
 
 ## Real-World Usage
 
-- **TLS certificates** — most HTTPS certificates on the public internet carry RSA-2048/4096 public keys, signed with RSASSA-PKCS1-v1_5 or RSASSA-PSS.
+- **TLS certificates** — RSA was still the most common public-key type in certificates logged to Certificate Transparency when Cloudflare launched its [Radar CT dashboard](https://radar.cloudflare.com/certificate-transparency) ([Cloudflare blog, 26 September 2025](https://blog.cloudflare.com/new-regional-internet-traffic-and-certificate-transparency-insights-on-radar/): more than 65% RSA, the rest ECDSA, with ECDSA "increasingly adopted"); see the live dashboard for the current split. RSA signatures on certificates use RSASSA-PKCS1-v1_5 or RSASSA-PSS.
 - **SSH authentication** — OpenSSH uses RSA host and user keys (commonly 3072/4096-bit) with the `rsa-sha2-256` / `rsa-sha2-512` signature algorithms.
-- **S/MIME email** — RFC 8551 wraps a per-message symmetric content key with RSA-OAEP for end-to-end encrypted enterprise mail.
+- **S/MIME email** — [RFC 8551 §2.3](https://www.rfc-editor.org/rfc/rfc8551.html#section-2.3) (S/MIME 4.0) protects the per-message content key for each recipient with ECDH ephemeral-static (MUST), PKCS #1 v1.5 RSA key transport (MUST- — still required, but expected to be downgraded) or RSAES-OAEP (SHOULD+ — expected to be promoted to MUST; levels defined in [§1.3](https://www.rfc-editor.org/rfc/rfc8551.html#section-1.3)) for end-to-end encrypted enterprise mail.
 - **Code signing** — Windows Authenticode, macOS `codesign`, and Java JAR signing all support RSA signatures to prove a binary was not tampered with.
 - **JSON Web Tokens (JWT)** — RFC 7518 `RS256/RS384/RS512` use RSASSA-PKCS1-v1_5; `PS256/PS384/PS512` use RSASSA-PSS.
+
+**Standards reviewed 15 November 2026:** the certificate key-type share above is Cloudflare's published September 2025 figure, not a 2026 number — the live Radar dashboard is the current source; S/MIME requirement levels are quoted from RFC 8551 §1.3 and §2.3.
 
 ## How to Run Locally
 

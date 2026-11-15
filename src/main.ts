@@ -36,8 +36,8 @@ function introHeader(): HTMLElement {
     <aside class="cl-hero-why" aria-label="Why it matters">
       <span class="cl-hero-why-label">WHY IT MATTERS</span>
       <p class="cl-hero-why-text">RSA secures TLS handshakes, code signing, and email. Its safety rests
-      entirely on factoring being infeasible at scale — and on padding like OAEP, since textbook RSA is
-      broken in practice.</p>
+      on the hardness of the RSA problem — factoring n breaks it, but breaking it is not known to require
+      factoring — and on padding like OAEP, since textbook RSA is broken in practice.</p>
     </aside>`;
   return h;
 }
