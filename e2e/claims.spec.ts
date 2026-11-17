@@ -470,3 +470,19 @@ test('a new key propagates to every downstream panel', async ({ page }) => {
   // Section 5 re-renders against the new modulus too.
   await expect(page.locator('#breaks .scale-card.weak h3')).toContainText(`n = ${k.n}`);
 });
+
+test('neither the hero nor the first panel pins RSA entirely on factoring', async ({ page }) => {
+  // The hero was corrected to "factoring n breaks it, but breaking it is not
+  // known to require factoring", and the first panel kept saying "RSA is built
+  // entirely on that gap" — which asserts the equivalence the hero denies.
+  // Factoring n suffices (it yields d), but no reduction the other way is
+  // known: the RSA problem is not known to be as hard as factoring.
+  const overview = (await page.locator('#overview .lede').innerText()).replace(/\s+/g, ' ');
+  expect(overview).not.toContain('built entirely on that gap');
+  expect(overview).toContain('RSA is built on that gap');
+  expect(overview).toContain('factoring n breaks RSA, but breaking RSA is not known to require factoring');
+
+  const body = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+  expect(body).not.toContain('entirely on that gap');
+  expect(body).toContain('breaking it is not known to require factoring');
+});

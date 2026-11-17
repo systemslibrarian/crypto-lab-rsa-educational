@@ -7,7 +7,8 @@ export function overviewPanel(): HTMLElement {
     el('h2', {}, ['1 · The big idea: a trapdoor']),
     el('p', { class: 'lede' }, [
       'Multiplying two prime numbers is easy. Factoring the product back into those primes is hard. ',
-      'RSA is built entirely on that gap — the easy door swings one way only.',
+      'RSA is built on that gap — the easy door swings one way only. The gap is not the whole story: ',
+      'factoring n breaks RSA, but breaking RSA is not known to require factoring.',
     ]),
     el('div', { class: 'trapdoor' }, [
       el('div', { class: 'trapdoor__side ok' }, [
