@@ -38,8 +38,8 @@ export function toyHash(message: string, n: bigint): bigint {
   let h = 0xcbf29ce484222325n;
   const prime = 0x100000001b3n;
   const mask = (1n << 64n) - 1n;
-  for (let i = 0; i < message.length; i++) {
-    h ^= BigInt(message.charCodeAt(i));
+  for (const byte of new TextEncoder().encode(message)) {
+    h ^= BigInt(byte);
     h = (h * prime) & mask;
   }
   const reduced = h % n;

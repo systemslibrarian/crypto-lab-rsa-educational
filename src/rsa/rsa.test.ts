@@ -7,7 +7,7 @@ import {
   selfCheck,
   validExponents,
 } from './keygen';
-import { decodeMessage, decrypt, encodeMessage, encrypt, sign, verify } from './textbook';
+import { decodeMessage, decrypt, encodeMessage, encrypt, sign, toyHash, verify } from './textbook';
 import { asPlaintext, PlaintextRangeError } from './types';
 import { breakKey, factor, projectFactoringYears, recoverPrivateExponent } from './factor';
 import { modexp } from './bigint-math';
@@ -35,7 +35,9 @@ describe('keygen validation (Invariant #2)', () => {
   it('rejects primes above the responsive educational ceiling before primality work', () => {
     expect(() => generateKeypair(MAX_EDUCATIONAL_PRIME + 1n, 53n, 17n)).toThrow(/p must be at most 65,537/);
     expect(() => generateKeypair(61n, MAX_EDUCATIONAL_PRIME + 1n, 17n)).toThrow(/q must be at most 65,537/);
-    expect(() => randomKeypair(17)).toThrow(/between 2 and 16 bits/);
+    expect(() => randomKeypair(2)).toThrow(/between 3 and 16 bits/);
+    expect(() => randomKeypair(17)).toThrow(/between 3 and 16 bits/);
+    expect(randomKeypair(3).pub.n).toBe(35n);
   });
 
   it('accepts the ceiling while keeping the largest modulus exactly representable', () => {
@@ -210,5 +212,14 @@ describe('break demo (the weak-key claim, Invariant #5)', () => {
 
   it('projects an astronomical cost for a 2048-bit key (never actually run)', () => {
     expect(projectFactoringYears(2048)).toBeGreaterThan(1e9);
+  });
+});
+
+
+describe('text encoding for the signing demonstration', () => {
+  it.each([
+    ['a', 6747n], ['é', 37502n], ['e\u0301', 30022n], ['🔐', 61424n],
+  ])('hashes the UTF-8 bytes of %s before reducing modulo 67591', (message, expected) => {
+    expect(toyHash(message, 67591n)).toBe(expected);
   });
 });

@@ -486,3 +486,27 @@ test('neither the hero nor the first panel pins RSA entirely on factoring', asyn
   expect(body).not.toContain('entirely on that gap');
   expect(body).toContain('breaking it is not known to require factoring');
 });
+
+test('key parameters become a draft until Generate succeeds', async ({ page }) => {
+  await page.goto('./');
+  const status = page.locator('#keygen .status');
+  await page.locator('#kg-p').fill('5');
+  await expect(status).toContainText('Inputs changed');
+  await expect(status).toContainText('n = 67591');
+  await expect(page.locator('#keygen .trace-host')).toBeEmpty();
+  await page.locator('#kg-q').fill('11');
+  await page.locator('#kg-e').selectOption('3');
+  await page.locator('#kg-generate').click();
+  await expect(status).toContainText('valid keypair generated');
+  await page.locator('#kg-e').selectOption('7');
+  await expect(status).toContainText('n = 55, e = 3');
+});
+
+test('the signing digest reflects the UTF-8 bytes students enter', async ({ page }) => {
+  await page.goto('./');
+  const digest = page.locator('#sign .io-row').first().locator('code').first();
+  for (const [text, expected] of [['a', '6747'], ['é', '37502'], ['🔐', '61424']]) {
+    await page.locator('#sv-msg').fill(text);
+    await expect(digest).toHaveText(expected);
+  }
+});

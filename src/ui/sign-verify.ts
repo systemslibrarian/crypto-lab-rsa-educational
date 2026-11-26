@@ -20,11 +20,11 @@ export function signVerifyPanel(): HTMLElement {
       const res = verify(delivered, signature, k.pub);
 
       const verdict = res.ok
-        ? el('div', { class: 'verdict good' }, ['✓ Signature VALID — message is authentic and unchanged'])
+        ? el('div', { class: 'verdict good' }, ['✓ Signature VALID — the displayed message digest matches under this public key'])
         : el('div', { class: 'verdict bad' }, ['✗ Signature INVALID — message was altered after signing']);
 
       out.append(
-        el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['H(message) signed — H = toy FNV-1a, not SHA-256']), codeBox(digest.toString(), 'digest')]),
+        el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['H(message) signed — H = FNV-1a on UTF-8 bytes, reduced modulo n; zero maps to one']), codeBox(digest.toString(), 'digest')]),
         el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['Signature s = H(m)^d mod n  (H = toy hash)']), codeBox(signature.toString(), 'signature')]),
         el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['Delivered message verifier sees']), codeBox(delivered, 'message')]),
         el('div', { class: 'io-row' }, [el('span', { class: 'io-row__label' }, ['Recovered s^e mod n vs fresh H(m)']), codeBox(`${res.recovered}  vs  ${res.expected}`, 'check')]),
@@ -46,7 +46,7 @@ export function signVerifyPanel(): HTMLElement {
     ]),
     el('div', { class: 'status warn' }, [
       el('span', {}, [
-        '⚠ Textbook RSA signing — no padding (no PKCS#1 v1.5, no PSS), and H is a 64-bit FNV-1a toy hash, not a cryptographic one. It is not collision resistant, so these signatures are forgeable. Teaching only.',
+        '⚠ Textbook RSA signing — no padding (no PKCS#1 v1.5, no PSS), and the 64-bit FNV-1a toy hash reads the UTF-8 message bytes, reduces the result modulo n, and maps zero to one for this exercise. It is not collision resistant, so these signatures are forgeable. Teaching only.',
       ]),
     ]),
     out,

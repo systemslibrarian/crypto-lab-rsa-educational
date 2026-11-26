@@ -62,7 +62,7 @@ export function generateKeypair(p: bigint, q: bigint, e: bigint): Keypair {
   const phi = (p - 1n) * (q - 1n);
 
   if (e <= 1n) throw new KeygenError(`e must be > 1. e = 1 leaves the message unencrypted.`);
-  if (e >= phi) throw new KeygenError(`e must be < φ(n) = ${phi}.`);
+  if (e >= phi) throw new KeygenError(`This lesson chooses e < φ(n) = ${phi}.`);
   if (gcd(e, phi) !== 1n) {
     throw new KeygenError(`gcd(e, φ) = ${gcd(e, phi)} ≠ 1, so e has no modular inverse and no private key d exists. Pick an e coprime to φ = ${phi}.`);
   }
@@ -76,17 +76,14 @@ export function generateKeypair(p: bigint, q: bigint, e: bigint): Keypair {
 
 /** Generate a random small keypair near the requested bit-size per prime. */
 export function randomKeypair(bitsPerPrime = 16): Keypair {
-  if (!Number.isInteger(bitsPerPrime) || bitsPerPrime < 2 || bitsPerPrime > MAX_RANDOM_BITS_PER_PRIME) {
-    throw new KeygenError(`random educational primes must use between 2 and ${MAX_RANDOM_BITS_PER_PRIME} bits each.`);
+  if (!Number.isInteger(bitsPerPrime) || bitsPerPrime < 3 || bitsPerPrime > MAX_RANDOM_BITS_PER_PRIME) {
+    throw new KeygenError(`random educational primes must use between 3 and ${MAX_RANDOM_BITS_PER_PRIME} bits each. Two-bit primes cannot form a pair with an exponent in this exercise’s range.`);
   }
-  for (;;) {
-    const p = randomPrime(bitsPerPrime);
-    let q = randomPrime(bitsPerPrime);
-    while (q === p) q = randomPrime(bitsPerPrime);
-    const phi = (p - 1n) * (q - 1n);
-    const e = chooseExponent(phi);
-    return generateKeypair(p, q, e);
-  }
+  const p = randomPrime(bitsPerPrime);
+  let q = randomPrime(bitsPerPrime);
+  while (q === p) q = randomPrime(bitsPerPrime);
+  const phi = (p - 1n) * (q - 1n);
+  return generateKeypair(p, q, chooseExponent(phi));
 }
 
 /** Ordered, human-readable trace of the derivation for the keygen panel. */

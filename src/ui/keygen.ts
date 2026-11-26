@@ -11,7 +11,7 @@ import {
 import { isProbablePrime } from '../rsa/bigint-math';
 import { el, clear } from './dom';
 import { renderSteps } from './step-trace';
-import { setKey } from './store';
+import { getKey, setKey } from './store';
 
 const SMALL_PRIMES = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 257, 263];
 
@@ -45,6 +45,17 @@ export function keygenPanel(): HTMLElement {
     }
   }
 
+  function activeKeyNote(): string {
+    const active = getKey();
+    return active ? ` Other panels still use the generated key n = ${active.pub.n}, e = ${active.pub.e}.` : '';
+  }
+
+  function markDraft(): void {
+    clear(trace);
+    status.className = 'status';
+    status.textContent = 'Inputs changed. Choose Generate to use these parameters.' + activeKeyNote();
+  }
+
   function build(): void {
     try {
       const p = readPrimeInput('p', pInput);
@@ -59,7 +70,7 @@ export function keygenPanel(): HTMLElement {
     } catch (err) {
       status.className = 'status bad';
       const msg = err instanceof KeygenError ? err.message : (err as Error).message;
-      const kids: Array<Node | string> = [el('span', {}, ['⚠ ' + msg])];
+      const kids: Array<Node | string> = [el('span', {}, ['⚠ ' + msg + activeKeyNote()])];
       if (err instanceof KeygenError) {
         kids.push(
           el('a', { class: 'status-link', href: '#breaks' }, [
@@ -72,8 +83,13 @@ export function keygenPanel(): HTMLElement {
     }
   }
 
-  pInput.addEventListener('input', refreshExponents);
-  qInput.addEventListener('input', refreshExponents);
+  for (const input of [pInput, qInput]) {
+    input.addEventListener('input', () => {
+      refreshExponents();
+      markDraft();
+    });
+  }
+  eSelect.addEventListener('change', markDraft);
 
   const datalist = el('datalist', { id: 'small-primes' }, SMALL_PRIMES.map((p) => el('option', { value: String(p) })));
   pInput.setAttribute('list', 'small-primes');
@@ -140,13 +156,10 @@ function phiAside(): HTMLElement {
     el('span', { class: 'phi-aside__tag' }, ['WHAT IS φ?']),
     el('p', {}, [
       el('strong', {}, ['φ(n)']),
-      ' counts how many numbers below n share ',
-      el('em', {}, ['no']),
-      ' common factor with n. For n = p·q that is exactly (p−1)(q−1). ',
-      'It is the size of the group of invertible residues, so exponents ',
-      'repeat with period φ — which is why d is taken as the inverse of e ',
-      el('strong', {}, ['mod φ']),
-      ', not mod n: we are inverting e in the exponent, and exponents live mod φ.',
+      ' counts the residues coprime to n. For two distinct primes p and q, φ(n) = (p−1)(q−1). ',
+      'This lesson computes the inverse of e modulo φ(n). RSA also permits an inverse modulo ',
+      'λ(n) = lcm(p−1, q−1), the least common exponent period of the invertible residues. ',
+      'For p = 5, q = 11 and e = 3, both d = 27 (modulo 40) and d = 7 (modulo 20) work.',
     ]),
   ]);
 }
